@@ -1,0 +1,51 @@
+# Azure VM Creator - example config.
+# Copy to config.yaml (loaded automatically by the GUI) and fill in your values:
+#   copy config.example.yaml config.yaml      (Windows)
+#   cp config.example.yaml config.yaml        (macOS / Linux)
+# Everything here can also be filled in / changed in the GUI, and the GUI can
+# save the form back to a file like this one ("Save config").
+
+auth:
+  method: browser        # browser | cli (uses 'az login') | device_code
+  tenant_id: ""          # optional: limit sign-in to one directory (tenant ID or domain)
+
+subscription: ""         # subscription ID or name (picked from a list in the GUI)
+resource_group: rg-vmcreator-demo   # created if it does not exist
+location: westeurope     # region name, e.g. westeurope, eastus, uksouth
+
+vm:
+  name: vm-demo-01                   # Windows: max 15 characters
+  size: Standard_B2s
+  image: ubuntu-24.04                # ubuntu-24.04, ubuntu-22.04, debian-12, rhel-9,
+                                     # windows-server-2025, windows-server-2022, windows-server-2019
+                                     # or any URN publisher:offer:sku:version
+  os_type: ""                        # only needed for custom URNs: linux | windows
+  admin_username: azureuser
+  auth_type: ssh                     # ssh | password (Windows always uses password)
+  ssh_public_key_path: ~/.ssh/id_rsa.pub
+  # admin_password: never store it here - type it in the GUI, or set the
+  # AZURE_VM_ADMIN_PASSWORD environment variable for the command line.
+  os_disk_type: StandardSSD_LRS      # Standard_LRS | StandardSSD_LRS | Premium_LRS | *_ZRS
+  os_disk_size_gb: null              # null = image default (usually 30 GB Linux, 127 GB Windows)
+  trusted_launch: true
+
+network:
+  vnet_name: ""                      # existing VNet to join, or new name; empty = "<vm name>-vnet"
+  vnet_resource_group: ""            # empty = same as resource_group
+  vnet_address_prefix: 10.0.0.0/16   # used only if the VNet is created
+  subnet_name: default
+  subnet_address_prefix: 10.0.0.0/24 # used only if the subnet is created
+  public_ip: true
+  open_ports: [22]                   # e.g. [22] for SSH, [3389] for RDP, [] for none
+  allowed_source: "*"                # better: your own public IP, e.g. 203.0.113.10/32
+
+# Tags are applied to the VM and to every resource created with it
+# (resource group if new, VNet if new, NSG, public IP, NIC, OS disk).
+tags:
+  Owner: ""
+  Environment: dev
+  CostCenter: ""
+  Project: ""
+
+# The GUI / CLI refuse to create the VM until these tags have values.
+required_tags: [Owner, Environment, CostCenter]

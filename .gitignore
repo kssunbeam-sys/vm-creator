@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+# your own config (may contain IDs you don't want to share); the example is tracked
+config.yaml
