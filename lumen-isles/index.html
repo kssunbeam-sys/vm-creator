@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Lumen Isles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud" class="hidden">
+  <div id="hud-tl" class="card">
+    <div id="hud-time"></div>
+    <div id="hud-coins"></div>
+    <div id="hud-place"></div>
+  </div>
+  <div id="hud-tr">
+    <div id="hud-hp"></div>
+    <div id="hud-quest" class="card"></div>
+  </div>
+  <div id="hud-menu"></div>
+  <div id="hud-bottom">
+    <div id="prompt"></div>
+    <div id="toolbar"></div>
+  </div>
+</div>
+<div id="toasts"></div>
+<div id="banner"></div>
+<div id="flash"></div>
+<div id="overlay"></div>
+<div id="title"></div>
+<div id="touch" class="hidden"><div id="joy"><div id="joy-knob"></div></div><button id="touch-act">✋</button><button id="touch-menu">🎒</button></div>
+<div id="fade"></div>
+<script src="js/util.js"></script>
+<script src="js/data.js"></script>
+<script src="js/art.js"></script>
+<script src="js/world.js"></script>
+<script src="js/systems.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
