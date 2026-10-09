@@ -47,7 +47,7 @@ G.Game = (() => {
     const c = Game.canvas, dpr = window.devicePixelRatio || 1;
     c.width = Math.floor(window.innerWidth * dpr); c.height = Math.floor(window.innerHeight * dpr);
     c.style.width = window.innerWidth + 'px'; c.style.height = window.innerHeight + 'px';
-    const z = Math.max(2, Math.round(Math.min(c.width / (26 * TS), c.height / (15 * TS))));
+    const z = Math.max(2, Math.round(Math.min(c.width / (30 * TS), c.height / (17 * TS))));
     Game.zoom = G.zoom = z;
     Game.vw = c.width / z; Game.vh = c.height / z;
   };
@@ -510,7 +510,7 @@ G.Game = (() => {
     G.UI.close();
     G.UI.fade(() => {
       if (hours) { s.time += hours * 60; if (s.time >= 1440) s.time -= 1440; if (s.time >= 360 && s.time - hours * 60 < 360) Game.newDay(); }
-      else { const passMidnight = s.time >= 360; s.time = 360; if (passMidnight || true) Game.newDay(); s.buffs.rested = s.day; }
+      else { s.time = 360; Game.newDay(); s.buffs.rested = s.day; } // morning always means a new day (days turn over at 6 AM)
       s.hp = s.maxHp; G.UI.dirty();
     }, 1400);
   };
@@ -927,10 +927,8 @@ G.Game = (() => {
     c.fillRect(0, 0, cv.width, cv.height);
     let cx = Game.cam.x - Game.vw / 2, cy = Game.cam.y - Game.vh / 2;
     const mw = map.W * TS, mh = map.H * TS;
-    if (map.kind !== 'overworld' || true) {
-      cx = mw < Game.vw ? (mw - Game.vw) / 2 : U.clamp(cx, 0, mw - Game.vw);
-      cy = mh < Game.vh ? (mh - Game.vh) / 2 : U.clamp(cy, 0, mh - Game.vh);
-    }
+    cx = mw < Game.vw ? (mw - Game.vw) / 2 : U.clamp(cx, 0, mw - Game.vw);
+    cy = mh < Game.vh ? (mh - Game.vh) / 2 : U.clamp(cy, 0, mh - Game.vh);
     cx = Math.round(cx * z) / z; cy = Math.round(cy * z) / z;
     Game.view = { x: cx, y: cy };
     c.setTransform(z, 0, 0, z, -cx * z, -cy * z);
@@ -1003,7 +1001,7 @@ G.Game = (() => {
         const mk = G.UI.npcMarker(n.id);
         if (mk) A.emoji(c, mk, n.x, n.y - 30 + Math.sin(t * 4) * 1.5, 9);
         if (Game.player && Math.hypot(n.x - Game.player.x, n.y - Game.player.y) < 44) Game.label(c, D.NPCS[n.id].name, n.x, n.y - 25);
-        if (Sys.isNight() && !n.shop && G.S.time > 23 * 60 || (G.S.time < 5 * 60 && !n.shop)) A.emoji(c, '💤', n.x + 7, n.y - 24 + Math.sin(t * 2) * 1.5, 6);
+        if (!n.shop && (G.S.time > 23 * 60 || G.S.time < 5 * 60)) A.emoji(c, '💤', n.x + 7, n.y - 24 + Math.sin(t * 2) * 1.5, 6);
       }
       for (const id in map.waystones) { const w = map.waystones[id]; if (Math.abs(w.x * TS - Game.player.x) < 40 && Math.abs(w.y * TS - Game.player.y) < 40) Game.label(c, w.label, w.x * TS + 8, w.y * TS - 32); }
     }

@@ -206,8 +206,8 @@
       G.UI.toast('✅ Quest complete: ' + q.title);
       G.Audio.sfx('quest');
       if (rw.unlock === 'homeUpgrade') { s.home.size = Math.min(2, s.home.size + 1); G.Game.invalidateHome(); }
-      if (rw.unlock === 'starterPet') setTimeout(() => G.UI.starterPet(), 50);
-      if (rw.unlock === 'finale') setTimeout(() => G.Game.finale(), 50);
+      if (rw.unlock === 'starterPet') G.UI.after(() => G.UI.starterPet());
+      if (rw.unlock === 'finale') G.UI.after(() => G.Game.finale());
       G.UI.dirty();
     },
     checkQuests() {

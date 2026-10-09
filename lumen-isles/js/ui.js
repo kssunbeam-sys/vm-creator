@@ -21,6 +21,7 @@ G.UI = (() => {
     UI.mode = null; UI.talkingTo = null;
     if (UI.fish) { const f = UI.fish; UI.fish = null; f.cb(false); }
     UI.dirty();
+    if (UI.queue && UI.queue.length) { const fn = UI.queue.shift(); setTimeout(fn, 50); }
   };
   UI.isOpen = () => !!UI.mode;
   function panel(title, opts) {
@@ -206,9 +207,12 @@ G.UI = (() => {
     if (s.day === 1 && id === 'bramble' && !s.quests.done.main_welcome) line = `Ah, ${s.name}! Welcome, welcome! I'm Mayor Bramble. We've been expecting you.`;
     UI.talkMenu(id, line);
   };
+  // run something once the current conversation line has been read (e.g. a reward screen)
+  UI.queue = [];
+  UI.after = function (fn) { if (UI.mode === 'dialog' || UI.mode === null && UI.talkingTo) UI.queue.push(fn); else setTimeout(fn, 50); };
   UI.npcSay = function (id, text, next) {
     const n = D.NPCS[id];
-    UI.dialog({ name: n.name, look: n.look, hearts: Sys.hearts(id), text, options: [{ label: 'Continue ▸', fn: next || UI.close }] });
+    UI.dialog({ name: n.name, look: n.look, hearts: Sys.hearts(id), text, options: [{ label: 'Continue ▸', fn: () => { if (UI.queue.length) UI.close(); else (next || UI.close)(); } }] });
   };
   UI.talkMenu = function (id, text) {
     const s = S(), n = D.NPCS[id], f = Sys.npc(id);
