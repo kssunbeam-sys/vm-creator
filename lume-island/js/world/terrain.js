@@ -329,7 +329,7 @@ export class Terrain {
 
   heightAt(x, z) {
     const s = this.surfaceAt(x, z);
-    if (s) return s.h;
+    if (s) return s.hAt ? s.hAt(x, z) : s.h;
     return this.groundAt(x, z);
   }
 

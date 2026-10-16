@@ -8,14 +8,14 @@ const STAPLES = ['flour', 'sugar', 'salt', 'earth_spirit'];
 export const SHOPS = {
   general_lumenbrook: { name: "Mira's General Store", markup: 2, sells: ['torch', 'chest', 'luma_food', 'rope', 'plank', 'glass', 'bottle', 'fiber', 'stone', 'wood', 'workbench', 'lamp_post', 'fence', 'flower_pot', 'bench', 'signpost'] },
   market_lumenbrook: { name: "Hattie's Farmers' Market", markup: 1.6, farm: true, sells: [...farmOf('meadow'), ...STAPLES, 'red_berry', 'hay_bale', 'scarecrow'] },
-  herbalist: { name: "Willow's Remedies", markup: 2, sells: ['daisy', 'poppy', 'bluebell', 'edelweiss', 'orchid', 'meadow_mushroom', 'porcini', 'glowcap', 'snowcap', 'ember_shroom', 'luma_food', 'red_dye', 'blue_dye', 'nature_spirit', 'lost_spirit', 'sap'] },
-  tackle: { name: "Finn's Tackle & Bait", markup: 2, sells: ['caterpillar', 'grasshopper', 'frost_beetle', 'firefly', 'magnet', 'rope', 'water_spirit'] },
-  smith_lumenbrook: { name: "Garrick's Smithy", markup: 2, sells: ['copper_ore', 'copper_bar', 'charcoal', 'nails', 'smelter', 'kiln'] },
+  herbalist: { name: "Willow's Remedies", markup: 2, sells: [{ id: 'net', price: 50 }, 'daisy', 'poppy', 'bluebell', 'edelweiss', 'orchid', 'meadow_mushroom', 'porcini', 'glowcap', 'snowcap', 'ember_shroom', 'luma_food', 'red_dye', 'blue_dye', 'nature_spirit', 'lost_spirit', 'sap'] },
+  tackle: { name: "Finn's Tackle & Bait", markup: 2, sells: [{ id: 'rod', price: 60 }, 'caterpillar', 'grasshopper', 'frost_beetle', 'firefly', 'magnet', 'rope', 'water_spirit'] },
+  smith_lumenbrook: { name: "Garrick's Smithy", markup: 2, sells: [{ id: 'whip', price: 120 }, 'copper_ore', 'copper_bar', 'charcoal', 'nails', 'smelter', 'kiln'] },
   inn_lumenbrook: { name: 'The Sleepy Lantern', markup: 1.8, sells: ['baked_potato', 'tomato_soup', 'fresh_bread', 'berry_juice', 'wheat_ale'], inn: 40 },
 
   general_mossvale: { name: "Birch's Woodcraft", markup: 2, sells: ['hardwood', 'plank', 'glue', 'leather', 'rope', 'torch', 'chest', 'luma_food', 'pinecone', 'planter', 'banner'] },
   market_mossvale: { name: "Hazel's Forest Market", markup: 1.6, farm: true, sells: [...farmOf('forest'), ...STAPLES, ...farmOf('meadow').slice(0, 4), 'blueberry'] },
-  smith_mossvale: { name: "Sorrel's Forge", markup: 2, sells: ['iron_ore', 'iron_bar', 'copper_bar', 'charcoal', 'nails'] },
+  smith_mossvale: { name: "Sorrel's Forge", markup: 2, sells: [{ id: 'whip', price: 120 }, 'iron_ore', 'iron_bar', 'copper_bar', 'charcoal', 'nails'] },
   inn_mossvale: { name: 'The Mossy Hearth', markup: 1.8, sells: ['mushroom_stew', 'pumpkin_pie', 'honey_mead', 'hop_ale'], inn: 60 },
 
   general_frostpeak: { name: "Garnet's Gem Trade", markup: 2, sells: ['rough_quartz', 'rough_amethyst', 'rough_topaz', 'rough_sapphire', 'moonstone_ore', 'gold_nugget', 'pearl', 'torch', 'luma_food', 'chest', 'pinewood'] },

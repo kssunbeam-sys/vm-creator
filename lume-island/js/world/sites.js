@@ -97,8 +97,10 @@ export function buildSites(world) {
   return out;
 }
 
-export function enterSite(s, door) {
+export function enterSite(s, door, exit = { x: door.x, z: door.z + 1.5 }) {
   const t = TEMPLES[s.id];
+  const blocked = G.quests?.siteBlocked?.(s.id);
+  if (blocked) { G.dialogue.openText(s.name, blocked); return; }
   if (s.kind === 'temple' && t?.needs && !G.save.flags['open_' + s.id]) {
     const missing = t.needs.filter(([id, q]) => G.inv.count(id) < q);
     if (missing.length) {
@@ -112,5 +114,5 @@ export function enterSite(s, door) {
     G.ui.toast('The seal accepts your offering and the door grinds open!', 'magic', 4000);
     G.events.emit('siteUnsealed', s.id);
   }
-  G.travel.enter(s, { x: door.x, z: door.z + 1.5 });
+  G.travel.enter(s, exit);
 }

@@ -41,6 +41,7 @@ export class ShopUI {
       const id = typeof e === 'string' ? e : e.id;
       const it = ITEMS[id];
       if (!it) continue;
+      if (it.cat === 'tool' && G.inv.has(id)) continue;
       const bought = G.save.flags['bought_' + this.shopId + '_' + id];
       if (e.once && bought) continue;
       let price, afford, payLabel;

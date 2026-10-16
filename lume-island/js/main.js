@@ -39,6 +39,9 @@ import { UseItems } from './systems/useitems.js';
 import { Fishing } from './systems/fishing.js';
 import { Bugs } from './systems/bugs.js';
 import { Shrines } from './world/shrines.js';
+import { Gates } from './world/gates.js';
+import { Quests } from './systems/quests.js';
+import { Towns } from './systems/towns.js';
 
 const qs = new URLSearchParams(location.search);
 
@@ -96,11 +99,14 @@ function boot() {
   G.items = new UseItems();
   G.fishing = new Fishing();
   G.bugs = new Bugs();
+  G.quests = new Quests();
 
   G.overworld = new Overworld(G.settings.quality);
   G.level = G.overworld;
   G.levels.set('overworld', G.overworld);
   G.shrines = new Shrines(G.overworld);
+  G.gates = new Gates(G.overworld);
+  G.towns = G.morel = new Towns(G.overworld);
   G.lightPool.attach(G.level.scene);
   G.particles.attach(G.level.scene);
   G.player = new Player();
@@ -155,6 +161,8 @@ function boot() {
       G.fishing.update(dt);
       G.bugs.update(dt);
       G.shrines.update(dt);
+      G.gates.update(dt);
+      G.quests.update(dt);
       G.events.emit('tick', dt);
       autosave += dt;
       if (autosave > 180 && G.level === G.overworld) { autosave = 0; saveGame('auto'); }

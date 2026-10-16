@@ -1,7 +1,7 @@
 // Tracks which biome / town the player is in, shows banners on arrival and
 // records discovered towns.
 import { G } from '../core/game.js';
-import { CITIES, BIOMES } from '../data/layout.js';
+import { CITIES, BIOMES, BIOME_BY_ID } from '../data/layout.js';
 
 export class Locator {
   constructor() { this._t = 0; this.where = null; }
@@ -13,7 +13,10 @@ export class Locator {
     const p = G.player.pos;
     let where = null;
     for (const c of Object.values(CITIES)) if (Math.hypot(p.x - c.x, p.z - c.z) < c.r + 6) where = { key: c.id, name: c.name, city: true };
-    const biome = G.overworld.biomeAt(p.x, p.z);
+    // out over the sea (piers, boats) the last biome stays
+    const rid = G.overworld.terrain.regionIdAt(p.x, p.z);
+    const biome = rid ? BIOME_BY_ID[rid] : (this.lastBiome || 'meadow');
+    this.lastBiome = biome;
     if (!where) where = { key: biome, name: BIOMES[biome].name };
     G.ui.setPlace(where.name);
     if (this.where && this.where.key !== where.key) {

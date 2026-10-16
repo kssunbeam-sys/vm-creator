@@ -115,6 +115,15 @@ export class Player {
   update(dt) {
     const level = G.level;
     const input = G.input;
+    if (this.ride) {
+      // scripted movement (the lift): the ride function moves pos directly
+      if (dt > 0) this.ride(dt);
+      this.object.position.copy(this.pos);
+      this.object.rotation.y = angleLerp(this.object.rotation.y, this.rotY, clamp(dt * 10, 0, 1));
+      this.rig.update(dt, this.rideSpeed || 0);
+      this.updateHeld();
+      return;
+    }
     if (this.invuln > 0) this.invuln -= dt;
     if (this.forceToolT > 0) this.forceToolT -= dt;
     let mv = { x: 0, z: 0, len: 0 };
