@@ -10,6 +10,7 @@ import { NodeField } from './nodes.js';
 import { scatterOverworld } from './scatter.js';
 import { Grass } from './grass.js';
 import { buildCities } from './city.js';
+import { buildHomestead } from './homestead.js';
 
 export class Overworld extends Level {
   constructor(quality) {
@@ -24,6 +25,7 @@ export class Overworld extends Level {
     this.nodes = new NodeField(this, scatterOverworld(this.terrain), { seed: 7 });
     this.grass = new Grass(this.terrain, this.scene, quality === 'low' ? 0.4 : quality === 'medium' ? 0.7 : 1);
     this.cities = buildCities(this);
+    this.homestead = buildHomestead(this);
   }
   heightAt(x, z) { return this.terrain.heightAt(x, z); }
   walkable(x, z) { return this.terrain.walkable(x, z); }
