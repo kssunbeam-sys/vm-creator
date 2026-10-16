@@ -13,10 +13,12 @@ export class UI {
     this.prompt = h('div', { class: 'prompt passive', hidden: true });
     this.fade = h('div', { class: 'fade passive' });
     this.bannerEl = h('div', { class: 'banner passive', hidden: true });
+    this.dark = h('div', { class: 'darkness passive' });
+    this.hurt = h('div', { class: 'hurt-flash passive' });
     this.hud = h('div', { class: 'hud' });
     this.buildHud();
     this.panelLayer = h('div', { class: 'panel-layer', hidden: true, onmousedown: (e) => { if (e.target === this.panelLayer) this.closeTop(); } });
-    root.append(this.hud, this.toasts, this.prompt, this.bannerEl, this.panelLayer, this.fade);
+    root.append(this.dark, this.hurt, this.hud, this.toasts, this.prompt, this.bannerEl, this.panelLayer, this.fade);
     this._lastHud = '';
     this.hotbarDirty = true;
     G.events.on('inv', () => { this.hotbarDirty = true; });
@@ -107,6 +109,18 @@ export class UI {
     this.updatePrompt();
   }
 
+  setDarkness(k) {
+    if (this._dk === k) return;
+    this._dk = k;
+    const r = 75 - k * 62;
+    this.dark.style.background = k > 0.01 ? `radial-gradient(circle at 50% 48%, rgba(0,0,0,0) ${Math.max(6, r - 22)}%, rgba(0,0,0,${0.45 + k * 0.55}) ${r}%)` : 'none';
+    this.dark.classList.toggle('warn', k > 0.6);
+  }
+  flashDamage() {
+    this.hurt.classList.remove('on');
+    void this.hurt.offsetWidth;
+    this.hurt.classList.add('on');
+  }
   setPlace(name) { if (this.place.textContent !== name) this.place.textContent = name; }
 
   // ---------- prompts ----------

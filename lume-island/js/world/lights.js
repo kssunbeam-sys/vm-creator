@@ -6,7 +6,7 @@ export class LightPool {
   constructor(n = 6) {
     this.lights = [];
     for (let i = 0; i < n; i++) {
-      const l = new THREE.PointLight(0xffc070, 0, 12, 1.6);
+      const l = new THREE.PointLight(0xffc070, 0, 12, 1.5);
       l.castShadow = false;
       this.lights.push(l);
     }
@@ -34,7 +34,7 @@ export class LightPool {
       l.color.set(s.color ?? 0xffc070);
       l.distance = s.distance ?? 12;
       const k = level.isInterior || s.always ? 1 : nightK;
-      l.intensity = (s.intensity ?? 3) * k;
+      l.intensity = (s.intensity ?? 3) * k * 9;
     }
   }
 }

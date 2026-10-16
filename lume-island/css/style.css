@@ -264,3 +264,9 @@ img.icon.big { width: 72px; height: 72px; background: var(--slot); border-radius
 .help-row span { color: var(--ink-soft); text-align: right; }
 .help-list { margin: 0; padding-left: 20px; line-height: 1.55; max-width: 70ch; }
 @media (max-width: 640px) { .diff-cards { grid-template-columns: 1fr; } .newgame-wrap { justify-content: center; align-items: flex-end; } .newgame { max-height: 62%; align-self: flex-end; } }
+.darkness { position: absolute; inset: 0; transition: background .25s linear; }
+.darkness.warn { animation: darkPulse 1s ease-in-out infinite; }
+@keyframes darkPulse { 50% { opacity: .85; } }
+.hurt-flash { position: absolute; inset: 0; background: radial-gradient(circle, rgba(255,60,60,0) 55%, rgba(255,40,40,.45) 100%); opacity: 0; }
+.hurt-flash.on { animation: hurtFlash .5s ease; }
+@keyframes hurtFlash { 0% { opacity: 1; } 100% { opacity: 0; } }

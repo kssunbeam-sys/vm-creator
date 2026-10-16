@@ -11,6 +11,7 @@ import { scatterOverworld } from './scatter.js';
 import { Grass } from './grass.js';
 import { buildCities } from './city.js';
 import { buildHomestead } from './homestead.js';
+import { buildSites } from './sites.js';
 
 export class Overworld extends Level {
   constructor(quality) {
@@ -26,7 +27,9 @@ export class Overworld extends Level {
     this.grass = new Grass(this.terrain, this.scene, quality === 'low' ? 0.4 : quality === 'medium' ? 0.7 : 1);
     this.cities = buildCities(this);
     this.homestead = buildHomestead(this);
+    this.sites = buildSites(this);
   }
+  onEnter() { G.lightPool.attach(this.scene); }
   heightAt(x, z) { return this.terrain.heightAt(x, z); }
   walkable(x, z) { return this.terrain.walkable(x, z); }
   biomeAt(x, z) { return this.terrain.biomeAt(x, z); }

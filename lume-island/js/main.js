@@ -30,6 +30,9 @@ import { Title } from './ui/title.js';
 import { Menu } from './ui/menu.js';
 import { saveGame, loadSettings } from './systems/save.js';
 import { Locator } from './systems/locator.js';
+import { Travel } from './systems/travel.js';
+import { Monsters, Projectiles, Clouds } from './entities/monsters.js';
+import { Effects } from './world/effects.js';
 
 const qs = new URLSearchParams(location.search);
 
@@ -77,6 +80,11 @@ function boot() {
   G.lightPool = new LightPool(G.settings.quality === 'low' ? 3 : 6);
   G.levels = new Map();
   G.saveGame = saveGame;
+  G.travel = new Travel();
+  G.monsters = new Monsters();
+  G.projectiles = new Projectiles();
+  G.clouds = new Clouds();
+  G.effects = new Effects();
 
   G.overworld = new Overworld(G.settings.quality);
   G.level = G.overworld;
@@ -130,6 +138,7 @@ function boot() {
       G.actions.update(dt);
       G.pickups.update(dt);
       G.locator.update(dt);
+      G.monsters.update(dt);
       G.events.emit('tick', dt);
       autosave += dt;
       if (autosave > 180 && G.level === G.overworld) { autosave = 0; saveGame('auto'); }
@@ -137,6 +146,7 @@ function boot() {
     G.placed.update(dt);
     G.lightPool.update(dt, G.level, G.level.sky ? G.level.sky.night : 1);
     G.particles.update(dt);
+    G.effects.update(dt);
     G.cam.update(dt, G.player.pos);
     if (render) {
       G.ui.update(dt);
