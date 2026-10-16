@@ -571,10 +571,8 @@ export class TempleLevel extends TileLevel {
   chestLoot(big, x, z) {
     const spawn = (id, q) => { if (q > 0) G.pickups.spawn(id, q, x, 1.2, z); };
     if (big) {
-      for (const [id, q] of this.def.reward) {
-        if (id === 'crystal_meadow') continue;
-        spawn(id, q);
-      }
+      for (const [id, q] of this.def.reward) spawn(id, q);
+      if (this.def.daily && G.shrines?.ruinOffering(this.biome)) spawn('crystal_' + this.biome, 1);
       G.particles?.burst('magic', x, 1.5, z, { n: 30 });
       if (!this.def.daily) {
         this.prog.done = true;

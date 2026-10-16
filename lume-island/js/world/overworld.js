@@ -3,7 +3,7 @@ import * as THREE from '../three.js';
 import { G } from '../core/game.js';
 import { Level } from './level.js';
 import { Terrain } from './terrain.js';
-import { createOcean } from './water.js';
+import { createOcean, createLake } from './water.js';
 import { Sky } from './sky.js';
 import { MAT, windUniform } from './materials.js';
 import { NodeField } from './nodes.js';
@@ -22,6 +22,7 @@ export class Overworld extends Level {
     this.ocean = createOcean(this.terrain.buildDepthTexture(512));
     this.scene.add(this.ocean);
     this.waterMat = this.ocean.userData.material;
+    for (const L of this.terrain.lakes) this.ocean.add(createLake(this.terrain, L, this.waterMat));
     this.sky = new Sky(this.scene, quality);
     this.nodes = new NodeField(this, scatterOverworld(this.terrain), { seed: 7 });
     this.grass = new Grass(this.terrain, this.scene, quality === 'low' ? 0.4 : quality === 'medium' ? 0.7 : 1);

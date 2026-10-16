@@ -88,6 +88,9 @@ export class Actions {
     } else if (target?.kind === 'entity') {
       if (!tool || (tool !== 'whip' && G.settings.smartTools && ownsTool('whip'))) { tool = ownsTool('whip') ? 'whip' : tool; if (tool === 'whip') this.selectTool('whip'); }
     }
+    // a treasure mound or glowing offering mound in front of you: dig it
+    const fx = pl.pos.x + Math.sin(pl.rotY) * 1.2, fz = pl.pos.z + Math.cos(pl.rotY) * 1.2;
+    if (!target && tool !== 'shovel' && ownsTool('shovel') && (G.settings.smartTools || !tool) && (G.treasure?.nearest(fx, fz, 1.9, G.level)?.revealed || G.treasure?.nearest(aim.x, aim.z, 1.9, G.level)?.revealed)) { tool = 'shovel'; this.selectTool('shovel'); }
     if (!tool) {
       // empty hand: try interacting instead
       if (this.best) { this.interact(); return; }
@@ -99,8 +102,19 @@ export class Actions {
     const anim = tool === 'shovel' ? 'dig' : 'swing';
     pl.showTool(tool);
     this.cooldown = 0.12;
+    const ax = aim.x, az = aim.z;
     pl.rig.play(anim, tool === 'shovel' ? 0.5 : 0.42, () => {
-      if (!target) { G.audio?.play('whoosh'); return; }
+      if (!target) {
+        if (tool === 'shovel') {
+          const dx = pl.pos.x + Math.sin(pl.rotY) * 1.2, dz = pl.pos.z + Math.cos(pl.rotY) * 1.2;
+          if (G.shrines?.tryDig(dx, dz) || G.treasure?.tryDig(dx, dz) || G.shrines?.tryDig(ax, az) || G.treasure?.tryDig(ax, az)) return;
+          G.particles?.burst('dig', dx, G.level.heightAt(dx, dz) + 0.2, dz, { n: 5 });
+          G.audio?.play('dig');
+          return;
+        }
+        G.audio?.play('whoosh');
+        return;
+      }
       if (target.kind === 'node') {
         const res = G.level.nodes.hit(target.node, tool, tool === 'hand' ? 1 : toolPower(tool), pl.pos.x, pl.pos.z);
         if (res.msg) G.ui.toast(res.msg, 'warn');

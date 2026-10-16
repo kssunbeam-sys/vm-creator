@@ -3,7 +3,7 @@
 import * as THREE from '../three.js';
 import { Noise2D, hash2 } from '../core/rng.js';
 import { clamp, lerp, smoothstep } from '../core/game.js';
-import { ISLAND_BLOBS, CITIES, HOMESTEAD, BRIDGE, LIFT, VOLCANO, DOCKS, SITES, PATHS, BIOME_BY_ID } from '../data/layout.js';
+import { ISLAND_BLOBS, CITIES, HOMESTEAD, BRIDGE, LIFT, VOLCANO, DOCKS, SITES, PATHS, BIOME_BY_ID, LAKES } from '../data/layout.js';
 
 export const HALF = 360, CELL = 2, N = 360, VN = N + 1, CHUNK = 30;
 export const REG = { OCEAN: 0, MEADOW: 1, FOREST: 2, MOUNTAIN: 3, JUNGLE: 4 };
@@ -16,7 +16,7 @@ const PAL = [
   { g1: C(0x8db96b), g2: C(0xadc985), rock: C(0x9a9daa), sand: C(0xbdb6a8), path: C(0xd6cfc2), cliff: C(0x8f93a1), snow: C(0xf3f7fc) },
   { g1: C(0x2fab52), g2: C(0x58c25c), rock: C(0x80695a), sand: C(0xf6e3a4), path: C(0xcda372), cliff: C(0x86705f), ash: C(0x5b4a45) },
 ];
-const UNDER = C(0xe3cd8f), DEEP = C(0x7f7a5d), PLAZA = C(0xb4a68e), HOMEPLOT = C(0xc9b07c);
+const UNDER = C(0xe3cd8f), LAKEBED = C(0xb9b6a2), DEEP = C(0x7f7a5d), PLAZA = C(0xb4a68e), HOMEPLOT = C(0xc9b07c);
 
 export class Terrain {
   constructor(seed = 1337) {
@@ -45,7 +45,37 @@ export class Terrain {
     }
     this.zones = [];
     this.buildZones();
+    this.lakes = LAKES.map((L) => {
+      let lo = Infinity;
+      for (let a = 0; a < 16; a++) lo = Math.min(lo, this.height(L.x + Math.cos(a / 8 * Math.PI) * (L.r + 5), L.z + Math.sin(a / 8 * Math.PI) * (L.r + 5)));
+      return { ...L, h: lo - 0.3 };
+    });
     this.generate();
+  }
+
+  // Alpine lake basins: a gravel rim around a bowl that holds water at L.h
+  lakeHeight(x, z, h) {
+    for (const L of this.lakes) {
+      const dx = x - L.x, dz = z - L.z;
+      if (dx * dx + dz * dz > (L.r + 11) ** 2) continue;
+      const d = Math.sqrt(dx * dx + dz * dz) + this.nD.noise(x * 0.16, z * 0.16) * 1.4;
+      const target = L.h + 0.42 + 0.25 * smoothstep(L.r, L.r + 5, d) - 0.8 * smoothstep(L.r, L.r - 2.2, d) - 2.8 * smoothstep(L.r * 0.92, L.r * 0.25, d);
+      h = lerp(h, target, smoothstep(L.r + 10, L.r + 3, d));
+    }
+    return h;
+  }
+  lakeAt(x, z, pad = 0) {
+    for (const L of this.lakes) if ((x - L.x) ** 2 + (z - L.z) ** 2 < (L.r + pad) ** 2) return L;
+    return null;
+  }
+  // water surface height at (x,z): sea level, or a lake's level inside its basin
+  waterLevelAt(x, z) { const L = this.lakeAt(x, z, 2.5); return L ? L.h : 0; }
+  // {y, depth, lake} if there is water at (x,z)
+  waterAt(x, z) {
+    const wl = this.waterLevelAt(x, z);
+    const g = this.groundAt(x, z);
+    if (g > wl - 0.22) return null;
+    return { y: wl, depth: wl - g, lake: wl !== 0 ? this.lakeAt(x, z, 2.5) : null };
   }
 
   // ---------- analytic shape ----------
@@ -166,6 +196,7 @@ export class Terrain {
 
   height(x, z, pw) {
     let h = this.rawHeight(x, z, pw);
+    if (this.lakes) h = this.lakeHeight(x, z, h);
     for (const zn of this.zones) {
       const dx = x - zn.x, dz = z - zn.z;
       const d2 = dx * dx + dz * dz, R = zn.r + zn.fall;
@@ -234,10 +265,11 @@ export class Terrain {
         }
         const rb = smoothstep(0.55, 0.95, slope);
         if (rb > 0) tmp.lerp(slope > 1.4 ? pal.cliff : pal.rock, rb);
-        if (h < 1.05) tmp.lerp(pal.sand, 1 - smoothstep(0.35, 1.05, h + n2 * 0.15));
+        const wl = this.waterLevelAt(x, z), hr = h - wl;
+        if (hr < 1.05) tmp.lerp(pal.sand, 1 - smoothstep(0.35, 1.05, hr + n2 * 0.15));
         if (PW[k] > 0 && h > 0.3) tmp.lerp(pal.path, PW[k] * 0.92);
         if (PZ[k] > 0) tmp.lerp(Math.hypot(x - HOMESTEAD.x, z - HOMESTEAD.z) < HOMESTEAD.r + 6 ? HOMEPLOT : PLAZA, PZ[k]);
-        if (h < 0) tmp.copy(UNDER).lerp(DEEP, smoothstep(0, 7, -h));
+        if (hr < 0) tmp.copy(wl ? LAKEBED : UNDER).lerp(DEEP, smoothstep(0, 7, -hr));
         VC[k * 3] = tmp.r; VC[k * 3 + 1] = tmp.g; VC[k * 3 + 2] = tmp.b;
       }
     }
@@ -253,7 +285,8 @@ export class Terrain {
         const slope = (mx - mn) / CELL;
         const x = -HALF + (i + 0.5) * CELL, z = -HALF + (j + 0.5) * CELL;
         cellReg[j * N + i] = this.regionAt(x, z);
-        walk[j * N + i] = hc > -0.3 && mn > -0.55 && slope < 1.15 ? 1 : 0;
+        const wl = this.waterLevelAt(x, z);
+        walk[j * N + i] = hc - wl > -0.3 && mn - wl > -0.55 && slope < 1.15 ? 1 : 0;
       }
     }
     // hard wall between the mountain plateau and the lowlands
@@ -392,6 +425,24 @@ export class Terrain {
     const tex = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
     tex.magFilter = THREE.LinearFilter; tex.minFilter = THREE.LinearFilter;
     tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+    tex.needsUpdate = true;
+    return tex;
+  }
+
+  // Depth texture for one lake, covering a square of half-size L.r + 6 around it
+  buildLakeDepthTexture(L, size = 64) {
+    const R = L.r + 6;
+    const data = new Uint8Array(size * size * 4);
+    for (let j = 0; j < size; j++) {
+      for (let i = 0; i < size; i++) {
+        const x = L.x - R + (i + 0.5) / size * R * 2, z = L.z - R + (j + 0.5) / size * R * 2;
+        const d = clamp((L.h - this.groundAt(x, z)) / 8, 0, 1);
+        const k = (j * size + i) * 4;
+        data[k] = Math.round(d * 255); data[k + 3] = 255;
+      }
+    }
+    const tex = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
+    tex.magFilter = THREE.LinearFilter; tex.minFilter = THREE.LinearFilter;
     tex.needsUpdate = true;
     return tex;
   }

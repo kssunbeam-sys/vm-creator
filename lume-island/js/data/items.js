@@ -167,8 +167,9 @@ for (const s of ['water', 'rock', 'lost', 'nature', 'earth']) {
   def('luma_life_' + s, 'Luma Life (' + s[0].toUpperCase() + s.slice(1) + ')', 'luma', 60, { k: 'vial', c: ITEMS[s + '_spirit'].model.c }, { spirit: s, desc: 'Pour onto a Mysterious Egg in an Incubator. The spirit decides what kind of Luma hatches.' });
 }
 def('mysterious_egg', 'Mysterious Egg', 'luma', 0, { k: 'egg_myst' }, { noSell: true, desc: 'Something inside glows softly. Hatch it in an Incubator with Luma Life.' });
+def('golden_egg', 'Golden Egg', 'luma', 0, { k: 'egg_myst', gold: true }, { noSell: true, desc: 'Warm as sunlight. The Great Luma sleeps inside.' });
 def('luma_food', 'Luma Food', 'luma', 10, { k: 'bowl', c: 0xf2a84a, c2: 0x7ad06a }, { desc: 'Feed your Lumas once a day for Luma Energy.' });
-def('super_luma_food', 'Super Luma Food', 'luma', 60, { k: 'bowl', c: 0xff7ad8, c2: 0xfff07a }, { desc: 'Instantly grants 3 Luma Energy.' });
+def('super_luma_food', 'Super Luma Food', 'luma', 60, { k: 'bowl', c: 0xff7ad8, c2: 0xfff07a }, { use: 'superfood', desc: 'Instantly grants 3 Luma Energy.' });
 
 // ---------------- treasure, keys, quest items ----------------
 def('tool_token', 'Tool Token', 'special', 0, { k: 'token', c: 0x8fd6ff, c2: 0x2a6aa0 }, { noSell: true, desc: 'Used with metal bars to upgrade tools at an anvil.' });
@@ -185,9 +186,9 @@ def('key_mountain', 'Ancient Key of Frost', 'special', 0, { k: 'key', c: 0x9fe4f
 def('key_jungle', 'Ancient Key of Ember', 'special', 0, { k: 'key', c: 0xff7a4a }, { noSell: true, stack: 1, desc: 'One of four keys to the Great Temple.' });
 def('frozen_tablet', 'Frozen Tablet', 'special', 0, { k: 'tablet', c: 0xbfe8ff }, { noSell: true, desc: 'Three of these open the Summit Sanctum.' });
 def('temple_key', 'Small Temple Key', 'special', 0, { k: 'key', c: 0xc9a86a, small: true }, { noSell: true, desc: 'Opens one locked door inside the temple where it was found.' });
-def('ancient_book', 'Ancient Book', 'special', 0, { k: 'book', c: 0x6a3ab8 }, { noSell: true, desc: 'Read it to learn forgotten blueprints.' });
+def('ancient_book', 'Ancient Book', 'special', 0, { k: 'book', c: 0x6a3ab8 }, { use: 'book', noSell: true, desc: 'Read it to learn forgotten blueprints.' });
 def('map_fragment', 'Map Fragment', 'treasure', 8, { k: 'map', c: 0xe9d6a6, frag: true }, { desc: 'Three fragments make a Treasure Map at a Treasure Workbench.' });
-def('treasure_map', 'Treasure Map', 'treasure', 30, { k: 'map', c: 0xe9d6a6 }, { desc: 'Use it to mark a buried chest on your map, then dig there.' });
+def('treasure_map', 'Treasure Map', 'treasure', 30, { k: 'map', c: 0xe9d6a6 }, { use: 'treasuremap', desc: 'Use it to mark a buried chest on your map, then dig there.' });
 for (const [b, n, c, p] of [['meadow', 'Muddy', 0x8a6a3a, 25], ['forest', 'Mossy', 0x5a7a3a, 50], ['mountain', 'Frosty', 0x8ab0c8, 90], ['jungle', 'Ember', 0x9a4a2a, 150]]) {
   def('coffer_' + b, n + ' Coffer', 'treasure', p, { k: 'chest', c, c2: 0xc9a040 }, { desc: 'Clean it at a Treasure Sink to see what is inside.', tier: b });
 }

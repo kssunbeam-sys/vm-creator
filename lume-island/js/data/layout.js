@@ -30,6 +30,12 @@ export const HOMESTEAD = { x: 2, z: 52, r: 22 };
 export const BRIDGE = { z: 62, halfLen: 16, halfW: 2.4, deck: 2.4 };
 export const LIFT = { x: -150 };
 export const VOLCANO = { x: 272, z: -98, r: 62 };
+// Alpine lakes on the mountain plateau (their water level is worked out by the terrain)
+export const LAKES = [
+  { id: 'mirror', name: 'Mirror Lake', x: -15, z: -245, r: 13 },
+  { id: 'frostmere', name: 'Frostmere', x: -168, z: -252, r: 11 },
+  { id: 'tarn', name: 'Glimmer Tarn', x: 24, z: -176, r: 9 },
+];
 
 export const DOCKS = {
   lumenbrook: { x: 55, z: 196, dir: 1, to: 'tikora' },   // pier runs south (+z)

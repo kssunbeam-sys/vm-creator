@@ -58,7 +58,7 @@ export class Professions {
       st.gift = true;
       for (const [it, q] of STARTER[id] || []) G.inv.add(it, q);
       const stations = p.stations.slice(0, id === 'jewel' || id === 'arch' ? 2 : 1).map((s) => ITEMS[s].name).join(' and ');
-      if (id === 'treasure') G.companions?.giveDog();
+      if (id === 'treasure') { G.save.flags.dog = true; if (!G.save.activeLuma) G.lumas?.setActive('dog'); }
       dlg.say(`Welcome, apprentice! Here is something to get you started. Build a ${stations} from your Build menu (B), and come back when you are ready for your first lesson.` + (id === 'treasure' ? ' Oh, and take Biscuit. Best treasure nose on the island!' : ''), back);
       return;
     }

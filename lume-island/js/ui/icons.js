@@ -57,3 +57,25 @@ export function iconURL(id, opts = {}) {
 export function clearIconCache(prefix) {
   for (const k of [...cache.keys()]) if (!prefix || k.startsWith(prefix)) cache.delete(k);
 }
+
+// Icon for an arbitrary vertex-coloured geometry (Lumas, the dog)
+export function objectIconURL(key, makeGeometry) {
+  if (cache.has(key)) return cache.get(key);
+  if (!renderer) init();
+  mesh.geometry = makeGeometry();
+  mesh.rotation.set(0.15, -0.5, 0);
+  mesh.position.set(0, 0, 0);
+  mesh.updateMatrixWorld();
+  const box = new THREE.Box3().setFromObject(mesh);
+  const sph = box.getBoundingSphere(new THREE.Sphere());
+  mesh.position.sub(sph.center);
+  mesh.updateMatrixWorld();
+  const dist = sph.radius / Math.sin(THREE.MathUtils.degToRad(15)) * 1.02;
+  camera.position.set(0, dist * 0.3, dist * 0.95);
+  camera.lookAt(0, 0, 0);
+  renderer.render(scene, camera);
+  const url = renderer.domElement.toDataURL('image/png');
+  mesh.position.set(0, 0, 0);
+  cache.set(key, url);
+  return url;
+}

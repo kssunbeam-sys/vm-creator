@@ -7,6 +7,8 @@ import { stationModel } from '../world/stationModels.js';
 import { processStation, isWorking, jobProgress } from './crafting.js';
 import { RECIPE_BY_ID } from '../data/recipes.js';
 import { iconURL } from '../ui/icons.js';
+import { itemGeometry } from '../world/itemModels.js';
+import { MAT } from '../world/materials.js';
 
 export const PROCESSING = new Set(['workbench', 'kiln', 'smelter', 'stove', 'cask_meadow', 'cask_forest', 'cask_mountain', 'cask_jungle', 'fish_table', 'forge', 'gem_cutter', 'jeweler_bench', 'treasure_sink', 'treasure_bench', 'rubble_refiner', 'restoration_table', 'luma_altar']);
 const texCache = new Map();
@@ -55,6 +57,14 @@ export class Placed {
       onInteract: () => this.interact(o),
     };
     level.addInteractable(o.inter);
+    if (o.type === 'incubator') {
+      o.eggMesh = new THREE.Mesh(itemGeometry('mysterious_egg'), MAT.world);
+      o.eggMesh.position.y = 0.92;
+      o.eggMesh.scale.setScalar(0.85);
+      o.eggMesh.castShadow = true;
+      g.add(o.eggMesh);
+      this.refreshEgg(o);
+    }
     if (PROCESSING.has(o.type)) {
       const sm = new THREE.SpriteMaterial({ transparent: true, depthWrite: false });
       const sp = new THREE.Sprite(sm);
@@ -82,7 +92,7 @@ export class Placed {
       return 'Use ' + name;
     }
     if (o.type === 'chest') return 'Open chest';
-    if (o.type === 'incubator') return o.data.egg ? 'Check Incubator' : 'Use Incubator';
+    if (o.type === 'incubator') return o.data.egg ? (G.lumas?.eggReady(o.data.egg) ? 'Hatch the egg!' : 'Check Incubator') : 'Use Incubator';
     if (o.type === 'luma_nest') return 'Visit your Lumas';
     return 'Pick up ' + name;
   }
@@ -119,6 +129,12 @@ export class Placed {
     G.audio?.play('pickup');
     return true;
   }
+  refreshEgg(o) {
+    if (!o.eggMesh) return;
+    const egg = o.data.egg;
+    o.eggMesh.visible = !!egg;
+    if (egg) o.eggMesh.geometry = itemGeometry(egg.type === 'golden_egg' ? 'golden_egg' : 'mysterious_egg');
+  }
   refreshSprite(o) {
     if (!o.sprite) return;
     let id = null, ready = false;
@@ -141,6 +157,11 @@ export class Placed {
     for (const o of this.objs) {
       if (o.sprite && o.sprite.visible && o.levelRef === G.level) {
         o.sprite.position.y = 2.4 + (o.sprite.userData.ready ? Math.abs(Math.sin(t * 4)) * 0.3 : Math.sin(t * 2) * 0.05);
+      }
+      if (o.eggMesh && o.eggMesh.visible && o.levelRef === G.level) {
+        const ready = G.lumas?.eggReady(o.data.egg);
+        o.eggMesh.rotation.z = ready ? Math.sin(t * 14) * 0.18 * (Math.sin(t * 1.3) > 0 ? 1 : 0.2) : Math.sin(t * 1.5) * 0.04;
+        if (ready && Math.random() < dt * 2) G.particles?.burst('sparkle', o.x, o.mesh.position.y + 1.3, o.z, { n: 2 });
       }
     }
   }

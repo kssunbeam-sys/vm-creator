@@ -141,7 +141,7 @@ export const TEMPLES = {
   // ---------------- Mountains ----------------
   t_mtn1: {
     theme: 'mountain', title: 'Forgotten Peak Temple',
-    reward: [['frozen_tablet', 1], ['tool_token', 1], ['$', 150]],
+    reward: [['frozen_tablet', 1], ['mysterious_egg', 1], ['tool_token', 1], ['$', 150]],
     rooms: [
       { map: [
         '#######D#######',
@@ -171,7 +171,7 @@ export const TEMPLES = {
   },
   t_mtn2: {
     theme: 'mountain', title: 'Forsaken Ice Temple',
-    reward: [['frozen_tablet', 1], ['tool_token', 1], ['$', 150]],
+    reward: [['frozen_tablet', 1], ['mysterious_egg', 1], ['tool_token', 1], ['$', 150]],
     rooms: [
       { map: [
         '#####D#####',
@@ -202,7 +202,7 @@ export const TEMPLES = {
   },
   t_mtn3: {
     theme: 'mountain', title: 'Frozen Echo Temple',
-    reward: [['frozen_tablet', 1], ['tool_token', 1], ['$', 150]],
+    reward: [['frozen_tablet', 1], ['mysterious_egg', 1], ['tool_token', 1], ['$', 150]],
     rooms: [
       { map: [
         '#####D#####',
@@ -360,7 +360,7 @@ export const TEMPLES = {
   // ---------------- The Great Temple (needs all four keys) ----------------
   great: {
     theme: 'great', title: 'The Great Temple', needs: [['key_meadow', 1], ['key_forest', 1], ['key_mountain', 1], ['key_jungle', 1]],
-    reward: [['mysterious_egg', 1], ['heart_crystal', 1], ['tool_token', 5], ['$', 1500]], final: true,
+    reward: [['golden_egg', 1], ['heart_crystal', 1], ['tool_token', 5], ['$', 1500]], final: true,
     rooms: [
       { map: [
         '#####D#####',
@@ -411,7 +411,7 @@ export const TEMPLES = {
   },
   // ---------------- Crystal ruins (reset every day) ----------------
   ruin_meadow: {
-    theme: 'meadow', title: 'Meadow Crystal Ruin', daily: true, reward: [['$', 60], ['crystal_meadow', 0], ['tool_token', 1]],
+    theme: 'meadow', title: 'Meadow Crystal Ruin', daily: true, reward: [['$', 60], ['tool_token', 1]],
     rooms: [{ map: [
       '#########',
       '#K..X..t#',

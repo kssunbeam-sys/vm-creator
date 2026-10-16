@@ -288,7 +288,7 @@ export function itemGeometry(id, opts = {}) {
       break;
     case 'egg': p.push(part(P.sphere(0.3, 12, 10), c, { ...S, sy: 1.3 })); break;
     case 'egg_myst':
-      p.push(part(P.sphere(0.36, 14, 10), 0xf4eedf, { ...S, sy: 1.3 }));
+      p.push(part(P.sphere(0.36, 14, 10), m.gold ? 0xffd86a : 0xf4eedf, { ...S, sy: 1.3 }));
       for (let i = 0; i < 7; i++) { const a = i * 0.9; p.push(part(P.sphere(0.08, 6, 5), i % 2 ? 0x7ad6ff : 0xc08aff, { ...S, x: Math.cos(a) * 0.33, y: Math.sin(i * 1.9) * 0.3, z: Math.sin(a) * 0.33, sx: 0.5, sz: 0.5 })); }
       break;
     case 'pumpkin':

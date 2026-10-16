@@ -20,6 +20,7 @@ void main() {
 const frag = /* glsl */`
 uniform sampler2D uDepth;
 uniform float uHalf;
+uniform vec2 uCenter;
 uniform float uTime;
 uniform float uDepthScale;
 uniform vec3 uShallow;
@@ -39,7 +40,7 @@ float vnoise(vec2 p) {
   return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
 }
 void main() {
-  vec2 uv = (vW.xz + uHalf) / (2.0 * uHalf);
+  vec2 uv = (vW.xz - uCenter + uHalf) / (2.0 * uHalf);
   float depth = uUseDepthTex > 0.5 ? texture2D(uDepth, uv).r * uDepthScale : uConstDepth;
   float t = smoothstep(0.0, 5.0, depth);
   vec3 col = mix(uShallow, uDeep, t);
@@ -69,6 +70,7 @@ export function createWaterMaterial(depthTex, opts = {}) {
       uWaveAmp: { value: opts.waveAmp ?? 1 },
       uDepth: { value: depthTex },
       uHalf: { value: opts.half ?? HALF },
+      uCenter: { value: new THREE.Vector2(opts.cx ?? 0, opts.cz ?? 0) },
       uDepthScale: { value: 8 },
       uUseDepthTex: { value: depthTex ? 1 : 0 },
       uConstDepth: { value: opts.constDepth ?? 8 },
@@ -114,4 +116,17 @@ export function createOcean(depthTex) {
   }
   group.userData.material = mat;
   return group;
+}
+
+// A mountain lake: a disc of water at the lake's level sharing the ocean's
+// time, light and fog uniforms.
+export function createLake(terrain, L, oceanMat) {
+  const mat = createWaterMaterial(terrain.buildLakeDepthTexture(L), { half: L.r + 6, cx: L.x, cz: L.z, waveAmp: 0.35, shallow: 0x6fe0e6, deep: 0x2a7fc4 });
+  for (const k of ['uTime', 'uLight', 'uFogColor', 'uFogDensity']) mat.uniforms[k] = oceanMat.uniforms[k];
+  const g = new THREE.CircleGeometry(L.r + 3.2, 48);
+  g.rotateX(-Math.PI / 2);
+  const m = new THREE.Mesh(g, mat);
+  m.position.set(L.x, L.h, L.z);
+  m.renderOrder = 1;
+  return m;
 }

@@ -61,7 +61,7 @@ const M = {
     out.body.push(part(P.cyl(0.9, 1.0, 0.5, 14), COPPER, { y: 0.25 }));
     out.body.push(part(P.torus(0.85, 0.08, 6, 16), 0xb86a2a, { rx: Math.PI / 2, y: 0.52 }));
     out.crystal.push(part(new THREE.SphereGeometry(0.8, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2), 0xd8f4ff, { ...S, y: 0.5 }));
-    out.body.push(part(P.sphere(0.32, 12, 10), 0xf4eedf, { ...S, y: 0.85, sy: 1.25 }));
+    out.body.push(part(P.cyl(0.36, 0.42, 0.12, 10), 0xc9a06a, { y: 0.56 }));
     for (let i = 0; i < 4; i++) out.glow.push(part(P.sphere(0.08, 6, 5), 0xffd27a, { ...S, x: Math.cos(i * 1.57) * 0.95, y: 0.35, z: Math.sin(i * 1.57) * 0.95 }));
     return { out, hw: 1.0, hd: 1.0 };
   },

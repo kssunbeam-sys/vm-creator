@@ -28,11 +28,17 @@ import { setStationModelBuilder } from './world/itemModels.js';
 import { stationGeometry } from './world/stationModels.js';
 import { Title } from './ui/title.js';
 import { Menu } from './ui/menu.js';
-import { saveGame, loadSettings } from './systems/save.js';
+import { saveGame, loadSettings, collect } from './systems/save.js';
 import { Locator } from './systems/locator.js';
 import { Travel } from './systems/travel.js';
 import { Monsters, Projectiles, Clouds } from './entities/monsters.js';
 import { Effects } from './world/effects.js';
+import { Lumas } from './systems/lumas.js';
+import { Treasure } from './systems/treasure.js';
+import { UseItems } from './systems/useitems.js';
+import { Fishing } from './systems/fishing.js';
+import { Bugs } from './systems/bugs.js';
+import { Shrines } from './world/shrines.js';
 
 const qs = new URLSearchParams(location.search);
 
@@ -85,10 +91,16 @@ function boot() {
   G.projectiles = new Projectiles();
   G.clouds = new Clouds();
   G.effects = new Effects();
+  G.lumas = new Lumas();
+  G.treasure = new Treasure();
+  G.items = new UseItems();
+  G.fishing = new Fishing();
+  G.bugs = new Bugs();
 
   G.overworld = new Overworld(G.settings.quality);
   G.level = G.overworld;
   G.levels.set('overworld', G.overworld);
+  G.shrines = new Shrines(G.overworld);
   G.lightPool.attach(G.level.scene);
   G.particles.attach(G.level.scene);
   G.player = new Player();
@@ -139,6 +151,10 @@ function boot() {
       G.pickups.update(dt);
       G.locator.update(dt);
       G.monsters.update(dt);
+      G.lumas.update(dt);
+      G.fishing.update(dt);
+      G.bugs.update(dt);
+      G.shrines.update(dt);
       G.events.emit('tick', dt);
       autosave += dt;
       if (autosave > 180 && G.level === G.overworld) { autosave = 0; saveGame('auto'); }
@@ -167,7 +183,7 @@ function boot() {
 
   // artifact viewer hot-reload support: keep the running game across republishes
   const hot = window.claude?.hot;
-  if (hot?.snapshot) hot.snapshot(() => (G.started ? { save: JSON.parse(JSON.stringify(G.saveCollect())), slot: G.slot } : {}));
+  if (hot?.snapshot) hot.snapshot(() => (G.started ? { save: JSON.parse(JSON.stringify(collect())), slot: G.slot } : {}));
   const resume = (data) => {
     if (data?.save) startGame({ fresh: false, slot: data.slot || 1, data: data.save });
     else if (qs.get('autostart')) startGame({ fresh: true, slot: 3, name: 'Tester', look: DEFAULT_LOOK, difficulty: qs.get('diff') || 'adventure', peaceful: qs.get('peaceful') === '1' });
@@ -215,6 +231,5 @@ function startGame(opts) {
   } else G.ui.toast('Welcome back, ' + data.name + '!', 'good');
   G.audio?.music?.('day');
 }
-G.saveCollect = () => { return import('./systems/save.js').then((m) => m.collect()); };
 
 boot();
