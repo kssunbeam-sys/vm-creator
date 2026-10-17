@@ -34,6 +34,15 @@ export class Overworld extends Level {
   heightAt(x, z) { return this.terrain.heightAt(x, z); }
   walkable(x, z) { return this.terrain.walkable(x, z); }
   biomeAt(x, z) { return this.terrain.biomeAt(x, z); }
+  // what the ground underfoot sounds like
+  surfaceKind(x, z) {
+    const T = this.terrain;
+    if (T.surfaceAt(x, z)) return 'wood';
+    for (const c of Object.values(this.cities)) if ((x - c.x) ** 2 + (z - c.z) ** 2 < (c.r * 0.36 + 1.2) ** 2) return 'stone';
+    if (T.groundAt(x, z) - T.waterLevelAt(x, z) < 1.0) return 'sand';
+    if (T.pathWeight(x, z) > 0.45) return 'path';
+    return T.biomeAt(x, z) === 'mountain' ? 'snow' : 'grass';
+  }
   update(dt) {
     super.update(dt);
     this.waterMat.uniforms.uTime.value = G.elapsed;

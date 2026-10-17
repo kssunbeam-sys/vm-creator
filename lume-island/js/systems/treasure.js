@@ -38,6 +38,10 @@ export class Treasure {
     const rng = new RNG(G.time.day * 977 + 13);
     this.spots = [];
     for (const b of BIOMES) for (let i = 0; i < 6; i++) { const p = this.randomSpot(rng, b, this.spots); if (p) this.spots.push({ ...p, biome: b, dug: false, revealed: false }); }
+    // spots already dug today stay dug after a reload
+    const dd = G.save.treasureDug;
+    if (dd && dd.day === G.time.day) this.spots.forEach((s, i) => { if (dd.ids.includes(i)) s.dug = true; });
+    else G.save.treasureDug = { day: G.time.day, ids: [] };
     for (const m of G.save.treasureMaps || []) { this.spots.push({ ...m, map: true, revealed: true }); this.showX(this.spots[this.spots.length - 1]); }
   }
   nearest(x, z, r, level) {
@@ -65,6 +69,8 @@ export class Treasure {
     const s = this.nearest(x, z, 1.9);
     if (!s) return false;
     s.dug = true;
+    const idx = this.spots.indexOf(s);
+    if (!s.map && G.save.treasureDug?.day === G.time.day) G.save.treasureDug.ids.push(idx);
     const m = this.marks.get(s);
     if (m) { G.overworld.scene.remove(m); this.marks.delete(s); }
     const y = G.overworld.heightAt(s.x, s.z) + 0.6;

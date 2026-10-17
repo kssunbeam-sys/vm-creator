@@ -58,14 +58,23 @@ export class Fishing {
       for (let i = 0; i < 3; i++) { const m = new THREE.Mesh(this.bubbleGeo, this.bubbleMat); m.position.set((i - 1) * 0.5, 0.05, (i % 2) * 0.4); mesh.add(m); }
       mesh.position.set(x, 0.02, z);
       G.overworld.scene.add(mesh);
-      this.bubbles.push({ x, z, mesh, t: rng.next() * 3, hinted: false });
+      this.bubbles.push({ id: this.bubbles.length, x, z, mesh, t: rng.next() * 3, hinted: false });
     }
+    // bubbles already fished out today stay gone after a reload
+    const used = G.save.bubblesUsed;
+    if (used && used.day === G.time.day) for (const b of [...this.bubbles]) { if (used.ids.includes(b.id)) this.removeBubble(b); }
+    else G.save.bubblesUsed = { day: G.time.day, ids: [] };
   }
   bubbleNear(x, z, r = 2.6) {
     if (G.level !== G.overworld) return null;
     return this.bubbles.find((b) => Math.hypot(b.x - x, b.z - z) < r) || null;
   }
-  removeBubble(b) { b.mesh.parent?.remove(b.mesh); this.bubbles = this.bubbles.filter((x) => x !== b); }
+  removeBubble(b) {
+    b.mesh.parent?.remove(b.mesh);
+    this.bubbles = this.bubbles.filter((x) => x !== b);
+    const used = G.save.bubblesUsed;
+    if (used && used.day === G.time.day && !used.ids.includes(b.id)) used.ids.push(b.id);
+  }
 
   // ---------- casting ----------
   waterAt(x, z) { return G.level === G.overworld ? G.overworld.terrain.waterAt(x, z) : null; }

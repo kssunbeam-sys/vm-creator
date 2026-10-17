@@ -42,6 +42,10 @@ import { Shrines } from './world/shrines.js';
 import { Gates } from './world/gates.js';
 import { Quests } from './systems/quests.js';
 import { Towns } from './systems/towns.js';
+import { MapUI } from './ui/map.js';
+import { Journal, Mail } from './ui/journal.js';
+import { Audio } from './systems/audio.js';
+import { TouchControls } from './ui/touch.js';
 
 const qs = new URLSearchParams(location.search);
 
@@ -68,6 +72,7 @@ function boot() {
   setStationModelBuilder(stationGeometry);
 
   G.inv = new Inventory(30);
+  G.audio = new Audio();
   G.ui = new UI(document.getElementById('ui'));
   G.pickups = new Pickups();
   G.particles = new Particles();
@@ -100,6 +105,10 @@ function boot() {
   G.fishing = new Fishing();
   G.bugs = new Bugs();
   G.quests = new Quests();
+  G.mapUI = new MapUI();
+  G.journal = new Journal();
+  G.mail = new Mail();
+  G.touch = new TouchControls(document.getElementById('ui'));
 
   G.overworld = new Overworld(G.settings.quality);
   G.level = G.overworld;
@@ -141,7 +150,7 @@ function boot() {
     if (inp.mouse.wheel && !G.paused) G.cam.addZoom(inp.mouse.wheel);
     for (let i = 0; i < 10; i++) if (inp.hit('Digit' + ((i + 1) % 10))) { G.inv.selected = i; G.ui.hotbarDirty = true; }
     if (inp.hit('Escape')) { if (G.ui.panels.length) G.ui.closeTop(); else G.menu.openPause(); }
-    else if (!G.ui.panels.length || G.ui.isOpen(G.invUI.panel) || G.ui.isOpen(G.build.panel)) {
+    else if (!G.ui.panels.length || [G.invUI.panel, G.build.panel, G.mapUI.panel, G.journal?.panel].some((p) => p && G.ui.isOpen(p))) {
       if (inp.hit('KeyB')) G.build.toggle();
       if (inp.hit('KeyI') || inp.hit('Tab')) G.invUI.toggle();
       if (inp.hit('KeyM')) G.mapUI?.toggle();
@@ -163,6 +172,8 @@ function boot() {
       G.shrines.update(dt);
       G.gates.update(dt);
       G.quests.update(dt);
+      G.mapUI.update(dt);
+      G.audio.update(dt);
       G.events.emit('tick', dt);
       autosave += dt;
       if (autosave > 180 && G.level === G.overworld) { autosave = 0; saveGame('auto'); }
@@ -174,6 +185,7 @@ function boot() {
     G.cam.update(dt, G.player.pos);
     if (render) {
       G.ui.update(dt);
+      G.touch.update();
       updateSeeThrough(camera, renderer, G.player.pos, G.cam.zoom, !G.level.noSeeThrough);
       renderer.render(G.level.scene, camera);
     }

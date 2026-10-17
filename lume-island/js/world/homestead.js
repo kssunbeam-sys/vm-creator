@@ -42,5 +42,5 @@ export function buildHomestead(world) {
   world.addInteractable({ x: hx, z: hz + 3.1, r: 0.8, h: 3.0, label: () => (G.time.hour >= 17 || G.time.hour < 6 ? 'Sleep in your cottage' : 'Your cottage (sleep after 5 PM)'), onInteract: () => G.sleep.atBed({ x: door.x, z: door.z }) });
   world.addInteractable({ x: mx, z: mz, r: 0.4, h: 1.8, label: 'Check the mailbox', onInteract: () => G.mail?.open() });
   world.addInteractable({ x: sx, z: sz, r: 0.6, h: 2.0, label: 'Read sign', onInteract: () => G.dialogue.openText('Sign', `${G.save.name}'s Homestead. Build anything you like on this land.`) });
-  return { door, x: hx, z: hz };
+  return { door, x: hx, z: hz, mailbox: { x: mx, y: world.heightAt(mx, mz), z: mz } };
 }
