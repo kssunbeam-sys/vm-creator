@@ -124,6 +124,18 @@ function boot() {
   G.player.place(c.x - 4, c.z + 6);
   G.locator = new Locator();
 
+  // graphics quality from Settings: resolution and shadows change at once,
+  // grass density and the light pool on the next reload
+  G.applyQuality = () => {
+    const q = G.settings.quality;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, q === 'high' ? 1.75 : q === 'medium' ? 1.25 : 1));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    if (renderer.shadowMap.enabled !== (q !== 'low')) {
+      renderer.shadowMap.enabled = q !== 'low';
+      for (const L of new Set([G.overworld, G.level])) L?.scene.traverse((o) => { if (o.material) for (const m of [].concat(o.material)) m.needsUpdate = true; });
+    }
+    G.ui.toast('Graphics updated. Grass and lights change after a reload.', 'info', 3500);
+  };
   window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
